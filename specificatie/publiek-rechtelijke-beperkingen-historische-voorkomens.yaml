@@ -1,0 +1,84 @@
+openapi: 3.0.3
+info:
+  title: "Haal Centraal BRK historie bevragen"
+  version: "1.0.0-dev"
+paths:
+  /publiekrechtelijkebeperkinghistorischevoorkomens/{kadastraalonroerendezaakidentificatie}:
+    get:
+      operationId: GetPubliekrechtelijkeBeperkingHistorischeVoorkomens
+      description: |
+        Het raadplegen van de historische voorkomens van een Publiekrechtelijke Beperking gekoppeld aan een Kadastraal Onroerende Zaak
+
+        Met behulp van de *datumvan* en *datumtotenmet* query string parameters kunnen de voorkomens worden gefilterd
+      parameters:
+        - name: kadastraalonroerendezaakidentificatie
+          in: path
+          required: true
+          schema:
+            type: string
+        - $ref: "https://raw.githubusercontent.com/VNG-Realisatie/Haal-Centraal-common/v1.1.0/api-specificatie/common.yaml#/components/parameters/datumvan"
+        - $ref: "https://raw.githubusercontent.com/VNG-Realisatie/Haal-Centraal-common/v1.1.0/api-specificatie/common.yaml#/components/parameters/datumtotenmet"
+      responses:
+        '200':
+          description: "Zoekactie geslaagd"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PubliekrechtelijkeBeperkingHistorischeVoorkomen"
+components:
+  schemas:
+    Geldig:
+      type: object
+      properties:
+        van:
+          type: string
+          format: date
+        totEnMet:
+          type: string
+          format: date
+    PubliekrechtelijkeBeperking:
+      type: object
+      description: |
+        = PubliekrechtelijkeBeperking in BRK bevragen minus
+          - isGebaseerdOpStukdeelIdentificatie
+          - isVermeldInStukdeelIdentificaties
+      properties:
+        identificatie:
+          type: "string"
+        domein:
+          type: "string"
+          description: "Het domein waartoe de identificatie behoort."
+        grondslag:
+          $ref: "https://raw.githubusercontent.com/VNG-Realisatie/Haal-Centraal-BRK-bevragen/Versie-1.2.0/specificatie/openapi.yaml#/components/schemas/Waardelijst"
+          description: "Mogelijke waarden zijn te vinden in deze [Waardelijst](http://www.kadaster.nl/schemas/waardelijsten/AardAantekening/)"
+        datumInWerking:
+          type: "string"
+          format: "date"
+        datumBeeindiging:
+          type: "string"
+          format: "date"
+        bevoegdGezag:
+          $ref: "https://raw.githubusercontent.com/VNG-Realisatie/Haal-Centraal-BRK-bevragen/Versie-1.2.0/specificatie/openapi.yaml#/components/schemas/NietNatuurlijkPersoonBeperkt"
+        beperkingsgebied:
+          $ref: "https://raw.githubusercontent.com/VNG-Realisatie/Haal-Centraal-BRK-bevragen/Versie-1.2.0/specificatie/openapi.yaml#/components/schemas/Beperkingsgebied"
+
+    PubliekrechtelijkeBeperkingVoorkomen:
+      allOf:
+        - $ref: "#/components/schemas/PubliekrechtelijkeBeperking"
+        - properties:
+            isGebaseerdOpStukdeel:
+              $ref: "https://raw.githubusercontent.com/VNG-Realisatie/Haal-Centraal-BRK-bevragen/Versie-1.2.0/specificatie/openapi.yaml#/components/schemas/Stukdeel"
+            isVermeldInStukdelen:
+              type: array
+              items:
+                $ref: "https://raw.githubusercontent.com/VNG-Realisatie/Haal-Centraal-BRK-bevragen/Versie-1.2.0/specificatie/openapi.yaml#/components/schemas/Stukdeel"
+
+    PubliekrechtelijkeBeperkingHistorischeVoorkomen:
+      type: object
+      properties:
+        geldig:
+          $ref: "#/components/schemas/Geldig"
+        voorkomen:
+          $ref: "#/components/schemas/PubliekrechtelijkeBeperkingVoorkomen"
