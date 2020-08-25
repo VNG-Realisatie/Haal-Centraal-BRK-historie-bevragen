@@ -1,13 +1,15 @@
 openapi: 3.0.3
 info:
   title: "Haal Centraal BRK historie bevragen"
-  version: "1.0.0-development"
+  version: "1.0.0-dev"
 paths:
   /kadastraalonroerendezaakhistorischevoorkomens/{kadastraalonroerendezaakidentificatie}:
     get:
       operationId: GetKadastraalOnroerendeZaakHistorischeVoorkomens
       description: |
         Het raadplegen van de historische voorkomens van een Kadastraal Onroerende Zaak
+
+        Met behulp van de *datumvan* en *datumtotenmet* query string parameters kunnen de voorkomens worden gefilterd
       parameters:
         - name: kadastraalonroerendezaakidentificatie
           in: path
@@ -27,6 +29,35 @@ paths:
                   $ref: "#/components/schemas/KadastraalOnroerendeZaakHistorischeVoorkomen"
 components:
   schemas:
+    Aantekening:
+      type: object
+      description: |
+        = Aantekening in BRK bevragen minus:
+          - stukIdentificaties
+          - isGebaseerdOpStukdeelIdentificatie
+          - isVermeldInStukdeelIdentificaties
+      properties:
+        aard:
+          $ref: "https://raw.githubusercontent.com/VNG-Realisatie/Haal-Centraal-BRK-bevragen/Versie-1.2.0/specificatie/openapi.yaml#/components/schemas/Waardelijst"
+          description: "Mogelijke waarden zijn te vinden in deze [Waardelijst](http://www.kadaster.nl/schemas/waardelijsten/AardAantekening/)"
+        omschrijving:
+          type: "string"
+        begrenzing:
+          $ref: "http://schemas.opengis.net/ogcapi/features/part1/1.0/openapi/schemas/polygonGeoJSON.yaml"
+        einddatum:
+          type: "string"
+          format: "date"
+        einddatumRecht:
+          type: "string"
+          format: "date"
+        indicatieOorspronkelijkObject:
+          type: "boolean"
+        betreftGedeelteVanPerceel:
+          type: "boolean"
+        betrokkenPersoonIdentificaties:
+          type: "array"
+          items:
+            $ref: "https://raw.githubusercontent.com/VNG-Realisatie/Haal-Centraal-BRK-bevragen/Versie-1.2.0/specificatie/openapi.yaml#/components/schemas/PersoonBeperkt"
     Geldig:
       type: object
       properties:
@@ -39,8 +70,7 @@ components:
     KadastraalOnroerendeZaak:
       type: object
       description: |
-        = KadastraalOnroerendeZaak in BRK bevragen
-        - minus:
+        = KadastraalOnroerendeZaak in BRK bevragen minus:
           - zakelijkGerechtigdeIdentificaties
           - stukIdentificaties
           - privaatrechtelijkeBeperkingIdentificaties
@@ -91,28 +121,52 @@ components:
             $ref: "https://raw.githubusercontent.com/VNG-Realisatie/Haal-Centraal-BRK-bevragen/Versie-1.2.0/specificatie/openapi.yaml#/components/schemas/Filiatie"
         verkavelObject:
           $ref: "https://raw.githubusercontent.com/VNG-Realisatie/Haal-Centraal-BRK-bevragen/Versie-1.2.0/specificatie/openapi.yaml#/components/schemas/VerkavelObject"
+    ZakelijkGerechtigde:
+      type: object
+      description: |
+        = ZakelijkGerechtigde in BRK bevragen minus:
+          - stukIdentificaties
+          - isGebaseerdOpStukdeelIdentificatie
+          - isVermeldInStukdeelIdentificaties
+      properties:
+        identificatie:
+          type: "string"
+          description: "Identificatie van de zakelijk gerechtigde."
+        type:
+          $ref: "https://raw.githubusercontent.com/VNG-Realisatie/Haal-Centraal-BRK-bevragen/Versie-1.2.0/specificatie/openapi.yaml#/components/schemas/TypeGerechtigde_enum"
+        aanvangsdatum:
+          type: "string"
+          description: "Datum waarop het zakelijk recht van kracht is geworden. "
+          format: "date"
+        erfpachtCanon:
+          $ref: "https://raw.githubusercontent.com/VNG-Realisatie/Haal-Centraal-BRK-bevragen/Versie-1.2.0/specificatie/openapi.yaml#/components/schemas/ErfpachtCanon"
+        tenaamstelling:
+          $ref: "https://raw.githubusercontent.com/VNG-Realisatie/Haal-Centraal-BRK-bevragen/Versie-1.2.0/specificatie/openapi.yaml#/components/schemas/Tenaamstelling"
+        toelichtingBewaarder:
+          type: "string"
+          description: "Toelichtende tekst van de bewaarder. De bewaarder is iemand die bij het Kadaster werkt. Hij schrijft stukken in in de openbare registers en de basisregistratie Kadaster conform de Kadasterwet."
+        mandeligheid:
+          $ref: "https://raw.githubusercontent.com/VNG-Realisatie/Haal-Centraal-BRK-bevragen/Versie-1.2.0/specificatie/openapi.yaml#/components/schemas/Mandeligheid"
+        persoon:
+          $ref: "https://raw.githubusercontent.com/VNG-Realisatie/Haal-Centraal-BRK-bevragen/Versie-1.2.0/specificatie/openapi.yaml#/components/schemas/PersoonBeperkt"
+        isOntstaanUitAppartementsrechtSplitsing:
+          $ref: "https://raw.githubusercontent.com/VNG-Realisatie/Haal-Centraal-BRK-bevragen/Versie-1.2.0/specificatie/openapi.yaml#/components/schemas/AppartementsrechtSplitsing"
+        isBetrokkenBijAppartementsrechtSplitsing:
+          type: array
+          items:
+            $ref: "https://raw.githubusercontent.com/VNG-Realisatie/Haal-Centraal-BRK-bevragen/Versie-1.2.0/specificatie/openapi.yaml#/components/schemas/AppartementsrechtSplitsing"
 
-    KadastraalOnroerendeZaakVoorkomen:
+    AantekeningVoorkomen:
       allOf:
-        - $ref: "#/components/schemas/KadastraalOnroerendeZaak"
+        - $ref: "#/components/schemas/Aantekening"
         - properties:
-            privaatrechtelijkeBeperkingen:
-              type: array
-              items:
-                $ref: "https://raw.githubusercontent.com/VNG-Realisatie/Haal-Centraal-BRK-bevragen/Versie-1.2.0/specificatie/openapi.yaml#/components/schemas/Aantekening"
             stukken:
               type: array
               items:
                 $ref: "#/components/schemas/StukVoorkomen"
-            zakelijkGerechtigden:
-              type: array
-              items:
-                $ref: "https://raw.githubusercontent.com/VNG-Realisatie/Haal-Centraal-BRK-bevragen/Versie-1.2.0/specificatie/openapi.yaml#/components/schemas/ZakelijkGerechtigde"
-    StukVoorkomen:
-      allOf:
-        - $ref: "https://raw.githubusercontent.com/VNG-Realisatie/Haal-Centraal-BRK-bevragen/Versie-1.2.0/specificatie/openapi.yaml#/components/schemas/Stuk"
-        - properties:
-            stukdelen:
+            isGebaseerdOpStukdeel:
+              $ref: "https://raw.githubusercontent.com/VNG-Realisatie/Haal-Centraal-BRK-bevragen/Versie-1.2.0/specificatie/openapi.yaml#/components/schemas/Stukdeel"
+            isVermeldInStukdelen:
               type: array
               items:
                 $ref: "https://raw.githubusercontent.com/VNG-Realisatie/Haal-Centraal-BRK-bevragen/Versie-1.2.0/specificatie/openapi.yaml#/components/schemas/Stukdeel"
@@ -123,3 +177,41 @@ components:
           $ref: "#/components/schemas/Geldig"
         voorkomen:
           $ref: "#/components/schemas/KadastraalOnroerendeZaakVoorkomen"
+    KadastraalOnroerendeZaakVoorkomen:
+      allOf:
+        - $ref: "#/components/schemas/KadastraalOnroerendeZaak"
+        - properties:
+            privaatrechtelijkeBeperkingen:
+              type: array
+              items:
+                $ref: "#/components/schemas/AantekeningVoorkomen"
+            stukken:
+              type: array
+              items:
+                $ref: "#/components/schemas/StukVoorkomen"
+            zakelijkGerechtigden:
+              type: array
+              items:
+                $ref: "#/components/schemas/ZakelijkGerechtigdeVoorkomen"
+    StukVoorkomen:
+      allOf:
+        - $ref: "https://raw.githubusercontent.com/VNG-Realisatie/Haal-Centraal-BRK-bevragen/Versie-1.2.0/specificatie/openapi.yaml#/components/schemas/Stuk"
+        - properties:
+            stukdelen:
+              type: array
+              items:
+                $ref: "https://raw.githubusercontent.com/VNG-Realisatie/Haal-Centraal-BRK-bevragen/Versie-1.2.0/specificatie/openapi.yaml#/components/schemas/Stukdeel"
+    ZakelijkGerechtigdeVoorkomen:
+      allOf:
+        - $ref: "#/components/schemas/ZakelijkGerechtigde"
+        - properties:
+            stukken:
+              type: array
+              items:
+                $ref: "#/components/schemas/StukVoorkomen"
+            isGebaseerdOpStukdeel:
+              $ref: "https://raw.githubusercontent.com/VNG-Realisatie/Haal-Centraal-BRK-bevragen/Versie-1.2.0/specificatie/openapi.yaml#/components/schemas/Stukdeel"
+            isVermeldInStukdelen:
+              type: array
+              items:
+                $ref: "https://raw.githubusercontent.com/VNG-Realisatie/Haal-Centraal-BRK-bevragen/Versie-1.2.0/specificatie/openapi.yaml#/components/schemas/Stukdeel"

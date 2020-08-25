@@ -2,4 +2,6 @@ openapi: 3.0.3
 info:
   title: "Haal Centraal BRK historie bevragen"
   version: "1.0.0-dev"
-paths: {}
+paths:
+  /kadastraalonroerendezaakhistorischevoorkomens/{kadastraalonroerendezaakidentificatie}:
+    $ref: "kadastraal-onroerende-zaken-historische-voorkomens.yaml#/paths/~1kadastraalonroerendezaakhistorischevoorkomens~1{kadastraalonroerendezaakidentificatie}"
