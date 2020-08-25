@@ -4,5 +4,212 @@ info:
   version: 1.0.0-dev
 servers:
 - url: /
-paths: {}
-components: {}
+paths:
+  /publiekrechtelijkebeperkinghistorischevoorkomens/{kadastraalonroerendezaakidentificatie}:
+    get:
+      description: |
+        Het raadplegen van de historische voorkomens van een Publiekrechtelijke Beperking gekoppeld aan een Kadastraal Onroerende Zaak
+
+        Met behulp van de *datumvan* en *datumtotenmet* query string parameters kunnen de voorkomens worden gefilterd
+      operationId: GetPubliekrechtelijkeBeperkingHistorischeVoorkomens
+      parameters:
+      - name: kadastraalonroerendezaakidentificatie
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: datumvan
+        in: query
+        description: De begindatum van de periode waarover de resource wordt opgevraagd.
+        required: false
+        schema:
+          type: string
+          format: date
+          example: 2018-09-09
+      - name: datumtotenmet
+        in: query
+        description: De einddatum van de periode waarover de resource wordt opgevraagd.
+        required: false
+        schema:
+          type: string
+          format: date
+          example: 2018-10-09
+      responses:
+        "200":
+          description: Zoekactie geslaagd
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PubliekrechtelijkeBeperkingHistorischeVoorkomen'
+components:
+  schemas:
+    PubliekrechtelijkeBeperkingHistorischeVoorkomen:
+      type: object
+      properties:
+        geldig:
+          $ref: '#/components/schemas/Geldig'
+        voorkomen:
+          $ref: '#/components/schemas/PubliekrechtelijkeBeperkingVoorkomen'
+    Geldig:
+      type: object
+      properties:
+        van:
+          type: string
+          format: date
+        totEnMet:
+          type: string
+          format: date
+    PubliekrechtelijkeBeperkingVoorkomen:
+      allOf:
+      - $ref: '#/components/schemas/PubliekrechtelijkeBeperking'
+      - properties:
+          isGebaseerdOpStukdeel:
+            $ref: '#/components/schemas/Stukdeel'
+          isVermeldInStukdelen:
+            type: array
+            items:
+              $ref: '#/components/schemas/Stukdeel'
+    PubliekrechtelijkeBeperking:
+      type: object
+      properties:
+        identificatie:
+          type: string
+        domein:
+          type: string
+          description: Het domein waartoe de identificatie behoort.
+        grondslag:
+          $ref: '#/components/schemas/Waardelijst'
+        datumInWerking:
+          type: string
+          format: date
+        datumBeeindiging:
+          type: string
+          format: date
+        bevoegdGezag:
+          $ref: '#/components/schemas/NietNatuurlijkPersoonBeperkt'
+        beperkingsgebied:
+          $ref: '#/components/schemas/Beperkingsgebied'
+      description: |
+        = PubliekrechtelijkeBeperking in BRK bevragen minus
+          - isGebaseerdOpStukdeelIdentificatie
+          - isVermeldInStukdeelIdentificaties
+    Waardelijst:
+      type: object
+      properties:
+        code:
+          minLength: 1
+          type: string
+        waarde:
+          type: string
+    NietNatuurlijkPersoonBeperkt:
+      allOf:
+      - $ref: '#/components/schemas/PersoonBasis'
+      - properties:
+          type:
+            $ref: '#/components/schemas/NietNatuurlijkPersoonType_enum'
+        description: Een niet-natuurlijk persoon.
+    PersoonBasis:
+      type: object
+      properties:
+        identificatie:
+          type: string
+          description: Unieke identificatie voor de persoon. Voor een Kadasterpersoon
+            is dit de identificatie zoals die door het Kadaster is vastgesteld. Voor
+            een ingeschreven natuurlijk persoon is dit het burgerservicenummer. Voor
+            een ingeschreven niet-natuurlijk persoon is dit het RSIN. Of de waarde
+            in identificatie een burgerservicenummer, een RSIN of een kadasterpersoonidentificatie
+            is kan worden afgeleid uit het type persoon.
+        omschrijving:
+          type: string
+          description: Voor mensen leesbare, herkenbare en identificerende omschrijving
+            van de persoon (met bijvoorbeeld de naam).
+      description: Een persoon kan een natuurlijk persoon of een niet-natuurlijk persoon
+        zijn. Kan zowel een ingeschreven persoon (in resp. BRP of KvK) of Kadasterpersoon
+        zijn.
+    NietNatuurlijkPersoonType_enum:
+      type: string
+      description: Een aanduiding die aangeeft of de persoon ingeschreven is in het
+        Handelsregister (KvK) met een rsin, dan wel vastgelegd is bij het Kadaster.
+      enum:
+      - ingeschreven_niet_natuurlijk_persoon
+      - kadaster_niet_natuurlijk_persoon
+    Beperkingsgebied:
+      type: object
+      properties:
+        identificatie:
+          type: string
+        werkingsgebied:
+          $ref: '#/components/schemas/Beperkingsgebied_werkingsgebied'
+    polygonGeoJSON:
+      required:
+      - coordinates
+      - type
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+          - Polygon
+        coordinates:
+          type: array
+          items:
+            minItems: 4
+            type: array
+            items:
+              minItems: 2
+              type: array
+              items:
+                type: number
+    Stukdeel:
+      type: object
+      properties:
+        identificatie:
+          type: string
+        domein:
+          type: string
+          description: Het domein waartoe de identificatie behoort.
+        aard:
+          $ref: '#/components/schemas/Waardelijst'
+        bedragTransactiesomLevering:
+          $ref: '#/components/schemas/Bedrag'
+        bedragVorderingsbeslag:
+          $ref: '#/components/schemas/Bedrag'
+        bedragZekerheidsstellingHypotheek:
+          $ref: '#/components/schemas/Bedrag'
+        omschrijvingGekozenWoonplaats:
+          type: string
+        omschrijvingKadastraleObjecten:
+          type: string
+        omschrijvingTopografischeMutatie:
+          type: string
+        redenDoorhalingTeboekstelling:
+          $ref: '#/components/schemas/Waardelijst'
+      description: Een stukdeel is een paragraaf in een akte waarmee een recht gevestigd
+        wordt.
+    Bedrag:
+      type: object
+      properties:
+        som:
+          type: number
+          description: Het bedrag. Dit is een waarde met max. 2 decimalen.
+          format: float
+        valuta:
+          $ref: '#/components/schemas/Waardelijst'
+      description: |-
+        Hoeveelheid geld in cijfers in een bepaalde valuta.
+
+        Waardelijst in deze component : [Valuta](http://www.kadaster.nl/schemas/waardelijsten/Valuta/)
+    Beperkingsgebied_werkingsgebied:
+      type: object
+      properties:
+        bgtObjectIdentificatie:
+          type: string
+        bagObjectIdentificatie:
+          type: string
+        kadastraalObjectIdentificatie:
+          type: string
+        vrijeContour:
+          $ref: '#/components/schemas/polygonGeoJSON'
+      description: Datgene waarop de beperking van toepassing is.
