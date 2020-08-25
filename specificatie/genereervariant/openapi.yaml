@@ -582,6 +582,8 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/StukVoorkomen'
+          tenaamstelling:
+            $ref: '#/components/schemas/TenaamstellingVoorkomen'
           isGebaseerdOpStukdeel:
             $ref: '#/components/schemas/Stukdeel'
           isVermeldInStukdelen:
@@ -602,8 +604,6 @@ components:
           format: date
         erfpachtCanon:
           $ref: '#/components/schemas/ErfpachtCanon'
-        tenaamstelling:
-          $ref: '#/components/schemas/Tenaamstelling'
         toelichtingBewaarder:
           type: string
           description: Toelichtende tekst van de bewaarder. De bewaarder is iemand
@@ -622,6 +622,7 @@ components:
       description: |
         = ZakelijkGerechtigde in BRK bevragen minus:
           - stukIdentificaties
+          - tenaamstelling
           - isGebaseerdOpStukdeelIdentificatie
           - isVermeldInStukdeelIdentificaties
     TypeGerechtigde_enum:
@@ -693,134 +694,6 @@ components:
         Het bedrag dat een erfpachter moet betalen aan de eigenaar van een stuk grond omdat hij zijn grond gebruikt.
 
         Waardelijst in deze component : [soortErfpachtCanon](http://www.kadaster.nl/schemas/waardelijsten/SoortErfpachtcanon/)
-    Tenaamstelling:
-      type: object
-      properties:
-        aandeel:
-          $ref: '#/components/schemas/TypeBreuk'
-        burgerlijkeStaatTenTijdeVanVerkrijging:
-          $ref: '#/components/schemas/Waardelijst'
-        verkregenNamensSamenwerkingsverband:
-          $ref: '#/components/schemas/Waardelijst'
-        aantekeningen:
-          type: array
-          description: Een aantekening is een verwijzing naar een ter inschrijving
-            aangeboden stuk. Een aantekening op een tenaamstelling van een zakelijk
-            recht is meestal een beperking. Bijvoorbeeld de verkrijging van een aandeel
-            in een zakelijk recht onder opschortende voorwaarde, een beperking van
-            de handelingsbevoegdheid van de zakelijk gerechtigde, of een koopovereenkomst
-          items:
-            $ref: '#/components/schemas/Aantekening_2'
-        gezamenlijkAandeel:
-          $ref: '#/components/schemas/TypeBreuk'
-        betrokkenPartner:
-          $ref: '#/components/schemas/NatuurlijkPersoonBeperkt'
-        betrokkenSamenwerkingsverband:
-          $ref: '#/components/schemas/NietNatuurlijkPersoonBeperkt'
-        betrokkenGorzenEnAanwassen:
-          $ref: '#/components/schemas/NietNatuurlijkPersoonBeperkt'
-        isGebaseerdOpStukdeelIdentificatie:
-          type: string
-          description: De identificatie van het stukdeel (paragraaf in een akte met
-            een rechtsfeit) waarop deze tenaamstelling is gebaseerd.
-        isVermeldInStukdeelIdentificaties:
-          type: array
-          items:
-            type: string
-            description: De identificaties van de stukdelen (paragrafen in een akte
-              met een rechtsfeit) waarin deze tenaamstelling is vermeld
-      description: |-
-        Een registratie van (een aandeel in) een zakelijk recht dat een persoon heeft, dat rust op een kadastraal onroerende zaak.
-
-        Waardelijst in deze component : [burgerlijkeStaatTenTijdeVanVerkrijging](http://www.kadaster.nl/schemas/waardelijsten/BurgerlijkeStaat/) en [verkregenNamensSamenwerkingsverband](http://www.kadaster.nl/schemas/waardelijsten/Samenwerkingsverband/)
-    TypeBreuk:
-      type: object
-      properties:
-        noemer:
-          title: noemer
-          maximum: 99999999
-          minimum: 1
-          type: integer
-          description: De noemer van het deel.
-        teller:
-          title: teller
-          maximum: 99999999
-          type: integer
-          description: Het aantal delen. De teller is altijd lager dan de noemer.
-      description: Een deling van twee gehele getallen
-      example:
-        noemer: 2
-        teller: 1
-    Aantekening_2:
-      type: object
-      properties:
-        aard:
-          $ref: '#/components/schemas/Waardelijst'
-        omschrijving:
-          type: string
-        begrenzing:
-          $ref: '#/components/schemas/polygonGeoJSON'
-        einddatum:
-          type: string
-          format: date
-        einddatumRecht:
-          type: string
-          format: date
-        indicatieOorspronkelijkObject:
-          type: boolean
-        betreftGedeelteVanPerceel:
-          type: boolean
-        stukIdentificaties:
-          type: array
-          description: Identificatie van het stuk. Een stuk is een brondocument dat
-            aanleiding geeft tot een wijziging van de gegevens in een basisregistratie.
-            Dit kan een aangeboden stuk of een Kadasterstuk zijn.
-          items:
-            type: string
-        isGebaseerdOpStukdeelIdentificatie:
-          type: string
-          description: De identificatie van het stukdeel (paragraaf in een akte met
-            een rechtsfeit) waarop deze aantekening is gebaseerd.
-        isVermeldInStukdeelIdentificaties:
-          type: array
-          description: De identificaties van de stukdelen (paragrafen in een akte
-            met een rechtsfeit) waarin deze aantekening is vermeld
-          items:
-            type: string
-        betrokkenPersoonIdentificaties:
-          type: array
-          items:
-            $ref: '#/components/schemas/PersoonBeperkt'
-      description: 'Waardelijst in deze component : [aard](http://www.kadaster.nl/schemas/waardelijsten/AardAantekening/)'
-    NatuurlijkPersoonBeperkt:
-      allOf:
-      - $ref: '#/components/schemas/PersoonBasis'
-      - properties:
-          type:
-            $ref: '#/components/schemas/NatuurlijkPersoonType_enum'
-        description: Natuurlijk persoon. Kan een ingeschreven persoon (in de basisregistratie
-          personen (BRP)) of Kadasterpersoon zijn.
-    NatuurlijkPersoonType_enum:
-      type: string
-      description: Een aanduiding die aangeeft of de persoon ingeschreven is in het
-        BRP met een burgerservicenummer, dan wel vastgelegd is bij het Kadaster.
-      enum:
-      - ingeschreven_natuurlijk_persoon
-      - kadaster_natuurlijk_persoon
-    NietNatuurlijkPersoonBeperkt:
-      allOf:
-      - $ref: '#/components/schemas/PersoonBasis'
-      - properties:
-          type:
-            $ref: '#/components/schemas/NietNatuurlijkPersoonType_enum'
-        description: Een niet-natuurlijk persoon.
-    NietNatuurlijkPersoonType_enum:
-      type: string
-      description: Een aanduiding die aangeeft of de persoon ingeschreven is in het
-        Handelsregister (KvK) met een rsin, dan wel vastgelegd is bij het Kadaster.
-      enum:
-      - ingeschreven_niet_natuurlijk_persoon
-      - kadaster_niet_natuurlijk_persoon
     Mandeligheid:
       properties:
         isGebaseerdOpStukdeelIdentificatie:
@@ -873,6 +746,94 @@ components:
       - Ondersplitsing
       - SpiegelsplitsingAfkoopErfpacht
       - SpiegelsplitsingOndersplitsing
+    NietNatuurlijkPersoonBeperkt:
+      allOf:
+      - $ref: '#/components/schemas/PersoonBasis'
+      - properties:
+          type:
+            $ref: '#/components/schemas/NietNatuurlijkPersoonType_enum'
+        description: Een niet-natuurlijk persoon.
+    NietNatuurlijkPersoonType_enum:
+      type: string
+      description: Een aanduiding die aangeeft of de persoon ingeschreven is in het
+        Handelsregister (KvK) met een rsin, dan wel vastgelegd is bij het Kadaster.
+      enum:
+      - ingeschreven_niet_natuurlijk_persoon
+      - kadaster_niet_natuurlijk_persoon
+    TenaamstellingVoorkomen:
+      allOf:
+      - $ref: '#/components/schemas/Tenaamstelling'
+      - properties:
+          aantekeningen:
+            type: array
+            description: Een aantekening is een verwijzing naar een ter inschrijving
+              aangeboden stuk. Een aantekening op een tenaamstelling van een zakelijk
+              recht is meestal een beperking. Bijvoorbeeld de verkrijging van een
+              aandeel in een zakelijk recht onder opschortende voorwaarde, een beperking
+              van de handelingsbevoegdheid van de zakelijk gerechtigde, of een koopovereenkomst
+            items:
+              $ref: '#/components/schemas/AantekeningVoorkomen'
+          isGebaseerdOpStukdeel:
+            $ref: '#/components/schemas/Stukdeel'
+          isVermeldInStukdelen:
+            type: array
+            items:
+              $ref: '#/components/schemas/Stukdeel'
+    Tenaamstelling:
+      type: object
+      properties:
+        aandeel:
+          $ref: '#/components/schemas/TypeBreuk'
+        burgerlijkeStaatTenTijdeVanVerkrijging:
+          $ref: '#/components/schemas/Waardelijst'
+        verkregenNamensSamenwerkingsverband:
+          $ref: '#/components/schemas/Waardelijst'
+        gezamenlijkAandeel:
+          $ref: '#/components/schemas/TypeBreuk'
+        betrokkenPartner:
+          $ref: '#/components/schemas/NatuurlijkPersoonBeperkt'
+        betrokkenSamenwerkingsverband:
+          $ref: '#/components/schemas/NietNatuurlijkPersoonBeperkt'
+        betrokkenGorzenEnAanwassen:
+          $ref: '#/components/schemas/NietNatuurlijkPersoonBeperkt'
+      description: |
+        = Tenaamstelling in BRK bevragen minus:
+          - aantekeningen
+          - isGebaseerdOpStukdeelIdentificatie
+          - isVermeldInStukdeelIdentificaties
+    TypeBreuk:
+      type: object
+      properties:
+        noemer:
+          title: noemer
+          maximum: 99999999
+          minimum: 1
+          type: integer
+          description: De noemer van het deel.
+        teller:
+          title: teller
+          maximum: 99999999
+          type: integer
+          description: Het aantal delen. De teller is altijd lager dan de noemer.
+      description: Een deling van twee gehele getallen
+      example:
+        noemer: 2
+        teller: 1
+    NatuurlijkPersoonBeperkt:
+      allOf:
+      - $ref: '#/components/schemas/PersoonBasis'
+      - properties:
+          type:
+            $ref: '#/components/schemas/NatuurlijkPersoonType_enum'
+        description: Natuurlijk persoon. Kan een ingeschreven persoon (in de basisregistratie
+          personen (BRP)) of Kadasterpersoon zijn.
+    NatuurlijkPersoonType_enum:
+      type: string
+      description: Een aanduiding die aangeeft of de persoon ingeschreven is in het
+        BRP met een burgerservicenummer, dan wel vastgelegd is bij het Kadaster.
+      enum:
+      - ingeschreven_natuurlijk_persoon
+      - kadaster_natuurlijk_persoon
     VerkavelObject_herverkavelingsGebied:
       type: object
       properties:
