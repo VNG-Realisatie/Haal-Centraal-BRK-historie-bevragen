@@ -1,0 +1,8 @@
+openapi: 3.0.3
+info:
+  title: Haal Centraal BRK historie bevragen
+  version: 1.0.0-dev
+servers:
+- url: /
+paths: {}
+components: {}
