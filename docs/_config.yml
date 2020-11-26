@@ -18,7 +18,7 @@ nav:
       - title: Getting started
         path: /getting-started
       - title: User stories
-        url: https://github.com/VNG-Realisatie/Haal-Centraal-BRK-historie-bevragen/issues?q=is%3Aissue+is%3Aopen+
+        url: https://github.com/VNG-Realisatie/Haal-Centraal-BRK-historie-bevragen/issues?q=is%3Aissue
         path: /user-stories
         target: blank
 #      - title: Bevragen API (swagger-ui)
